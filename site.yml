@@ -1,0 +1,10 @@
+---
+- name: install site
+  connection: local
+  hosts: localhost
+  become: true
+
+  roles:
+          - system
+          - account
+          - xorg

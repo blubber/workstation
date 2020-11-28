@@ -1,0 +1,98 @@
+---
+- name: ensure group
+  group:
+          name: tiemo
+          state: present
+
+- name: ensure user
+  user:
+          group: tiemo
+          groups:
+                  - wheel
+          name: tiemo
+          state: present
+
+- name: ensure sudo
+  pacman:
+          name: sudo
+          state: present
+
+- name: ensure sudoers
+  lineinfile:
+          dest: /etc/sudoers
+          regexp: '^#\s*%wheel ALL=\(ALL\) ALL$'
+          line: "%wheel ALL=(ALL) ALL"
+
+- name: ensure git
+  pacman:
+          name: git
+          state: present
+
+- name: stat dotfiles
+  register: dotfiles
+  stat:
+          path: /home/tiemo/.local/dotfiles
+
+- name: ensure dotfiles directory
+  file:
+          group: tiemo
+          mode: 0700
+          owner: tiemo
+          path: /home/tiemo/.local/dotfiles
+          recurse: true
+          state: directory
+
+- name: ensure git clone
+  when: dotfiles.stat.exists == false
+  become: true
+  become_user: tiemo
+  git:
+          clone: yes
+          dest: /home/tiemo/.local/dotfiles
+          repo: https://github.com/blubber/dotfiles.git
+
+- name: ensure home directory git repo is reset
+  when: dotfiles.stat.exists == false
+  become: yes
+  become_user: tiemo
+  command:
+          argv:
+                  - git
+                  - '--git-dir'
+                  - '/home//tiemo/.local/dotfiles/.git'
+                  - '--work-tree'
+                  - '/home/tiemo'
+                  - 'reset'
+                  - '--hard'
+          chdir: /home/tiemo
+
+- name: stat src dir
+  register: src
+  stat:
+          path: /home/tiemo/.local/src
+
+- name: ensure src dir
+  file:
+          group: tiemo
+          mode: 0700
+          owner: tiemo
+          path: /home/tiemo/.local/src/
+          recurse: true
+          state: directory
+
+- name: checkout dwm
+  when: src.stat.exists == false
+  become: yes
+  become_user: tiemo
+  git:
+          clone: yes
+          dest: /home/tiemo/.local/src/dwm
+          repo: https://github.com/blubber/dwm.git
+
+- name: ensure dwm build requirements
+  loop:
+          - gcc
+          - make
+  pacman:
+          name: "{{ item }}"
+          state: present

@@ -1,0 +1,40 @@
+---
+- name: ensure desktop packages
+  loop:
+        - adobe-source-sans-pro-fonts
+        - alacritty
+        - alsa-firmware
+        - alsa-lib
+        - alsa-plugins
+        - alsa-utils
+        - awesome-terminal-fonts
+        - cantarell-fonts
+        - dmenu
+        - feh
+        - noto-fonts
+        - pavucontrol
+        - picom
+        - playerctl
+        - pulseaudio
+        - pulseaudio-alsa
+        - sxhkd
+        - tamsyn-font
+        - thunar
+        - thunar-archive-plugin
+        - thunar-volman
+        - ttf-bitstream-vera
+        - ttf-dejavu
+        - ttf-droid
+        - ttf-hack
+        - ttf-inconsolata
+        - ttf-liberation
+        - ttf-roboto
+        - ttf-ubuntu-font-family
+        - volumeicon
+        - xorg-server
+        - xorg-xfontsel
+        - xorg-xinit
+        - xorg-xsetroot
+  pacman:
+          name: "{{ item }}"
+          state: present

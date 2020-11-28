@@ -1,0 +1,21 @@
+---
+- name: ensure system packages
+  loop:
+        - ansible
+        - cantarell-fonts
+        - git
+        - neovim
+        - networkmanager
+        - openssh
+        - samba
+        - sudo
+        - vim
+  pacman:
+          name: "{{ item }}"
+          state: present
+
+- name: ensure networkmanager
+  systemd:
+          enabled: true
+          name: NetworkManager
+          state: started
